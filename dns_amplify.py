@@ -16,17 +16,19 @@ def main():
 
     packet = IP(dst=SERVER_IP) / UDP(dport=port) / DNS(qd=DNSQR(qname=DOMAIN, qtype=255))
 
-    response = sr1(packet, verbose=0)
+    response = sr1(packet, timeout=3, verbose=0)
 
     if response:
         response.show()
 
-    request_size = len(bytes(packet[DNS]))
-    response_size = len(bytes(response[DNS])) if response else 0
+        request_size = len(bytes(packet[DNS]))
+        response_size = len(bytes(response[DNS])) if response else 0
 
-    print(f"Request Size: {request_size}")
-    print(f"Response Size: {response_size}")
-    print(f"Amplification: {response_size / request_size:.2f}")
+        print(f"Request Size: {request_size}")
+        print(f"Response Size: {response_size}")
+        print(f"Amplification: {response_size / request_size:.2f}")
+    else:
+        print("No response")
     
 if __name__ == "__main__":
     main()
