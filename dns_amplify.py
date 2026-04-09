@@ -5,7 +5,7 @@ from scapy.all import DNS, DNSQR, IP, sr1, UDP
 import sys
 
 SERVER_IP = "cs177.seclab.cs.ucsb.edu"
-DOMAIN="amplifiedsecurity.com"
+DOMAIN = "amplifiedsecurity.com"
 
 def main():
     if len(sys.argv) != 2:
@@ -21,8 +21,8 @@ def main():
     if response:
         response.show()
 
-    request_size = len(packet)
-    response_size = len(response) if response else 0
+    request_size = len(bytes(packet[DNS]))
+    response_size = len(bytes(response[DNS])) if response else 0
 
     print(f"Request Size: {request_size}")
     print(f"Response Size: {response_size}")
