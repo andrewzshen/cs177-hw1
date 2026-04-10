@@ -14,7 +14,7 @@ def main():
 
     port = int(sys.argv[1])
 
-    packet = IP(dst=SERVER_IP) / UDP(dport=port) / DNS(qd=DNSQR(qname=DOMAIN, qtype=255))
+    packet = IP(dst=SERVER_IP) / UDP(dport=port) / DNS(qd=DNSQR(qname=DOMAIN, qtype=1))
 
     response = sr1(packet, timeout=3, verbose=0)
 
@@ -26,7 +26,7 @@ def main():
 
         print(f"Request Size: {request_size}")
         print(f"Response Size: {response_size}")
-        print(f"Amplification: {response_size / request_size:.2f}")
+        print(f"BAF: {response_size / request_size:.2f}")
     else:
         print("No response")
     
