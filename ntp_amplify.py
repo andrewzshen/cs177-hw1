@@ -19,34 +19,35 @@ def main():
         payload = f"TimeRequest {ip}".encode()
         send(IP(dst=SERVER_IP) / UDP(dport=port) / Raw(load=payload), verbose=0)
     
-    for i in range(1 << 5):
-        print(f"Trying request num {i}:")
+    # for i in range(1 << 5):
 
-        payload = bytes([
-            0x1e,
-            i, 
-            0x00, 0x01,  # sequence
-            0x00, 0x00,  # status
-            0x00, 0x00,  # assoc id
-            0x00, 0x00,  # offset
-            0x00, 0xff   # count 
-        ]) + 36 * b"\x00"
+    # print(f"Trying request num {i}:")
+
+    payload = bytes([
+        0x1e,
+        0x04, 
+        0x00, 0x01,  # sequence
+        0x00, 0x00,  # status
+        0x00, 0x00,  # assoc id
+        0x00, 0x00,  # offset
+        0x00, 0xff   # count 
+    ]) + 36 * b"\x00"
+    
+    packet = IP(dst=SERVER_IP) / UDP(dport=port) / Raw(load=payload)
+
+    response = sr1(packet, timeout=12, verbose=0)
+
+    if response:
+        response.show()
         
-        packet = IP(dst=SERVER_IP) / UDP(dport=port) / Raw(load=payload)
+        request_size = len(bytes(packet[Raw]))
+        response_size = len(bytes(response[Raw])) if response else 0
 
-        response = sr1(packet, timeout=3, verbose=0)
-
-        if response:
-            response.show()
-            
-            request_size = len(bytes(packet[Raw]))
-            response_size = len(bytes(response[Raw])) if response else 0
-
-            print(f"Request Size: {request_size}")
-            print(f"Response Size: {response_size}")
-            print(f"Amplification: {response_size / request_size:.2f}")
-        else:
-            print("No response")
+        print(f"Request Size: {request_size}")
+        print(f"Response Size: {response_size}")
+        print(f"Amplification: {response_size / request_size:.2f}")
+    else:
+        print("No response")
     
 if __name__ == "__main__":
     main()
