@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from scapy.all import Raw, IP, sr1, send, UDP
+from scapy.all import * 
 
+import socket
 import sys
 
 SERVER_IP = "cs177.seclab.cs.ucsb.edu"
@@ -13,20 +14,22 @@ def main():
 
     port = int(sys.argv[1])
 
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     for i in range(50):
-        ip = f"10.0.0.{i}"
+        ip = f"1.1.1.{i}"
+        request = f"TimeRequest {ip}".encode()
+        packet = Raw(load=request)
         print(f"Sending IP: {ip}")
-        payload = f"TimeRequest {ip}".encode()
-        packet = IP(dst=SERVER_IP) / UDP(dport=port) / Raw(load=payload)
-        send(packet, verbose=0)
+        sock.sendto(bytes(packet), (SERVER_IP, port))
 
-    payload = b"0x1f" + 47 * b"\x00"
+    request = b"0x1f" + 47 * b"\x00"
 
-    packet = IP(dst=SERVER_IP) / UDP(dport=port) / Raw(load=payload)
+    packet = Raw(load=request)
 
-    response = sr1(packet, timeout=12, verbose=0)
+    sock.sendto(bytes(packet), (SERVER_IP, port))
 
-    if response:
+    if :
         response.show()
 
         request_size = len(bytes(packet[Raw]))
