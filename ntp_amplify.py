@@ -14,33 +14,38 @@ def main():
 
     port = int(sys.argv[1])
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     for i in range(50):
         ip = f"1.1.1.{i}"
         request = f"TimeRequest {ip}".encode()
-        packet = Raw(load=request)
-        print(f"Sending IP: {ip}")
-        sock.sendto(bytes(packet), (SERVER_IP, port))
+        print(f"[+] Sending IP: {ip}")
+        s.sendto(request, (SERVER_IP, port))
 
     request = b"0x1f" + 47 * b"\x00"
+    print("[+] Sending trigger packet")
+    s.sendto(request, (SERVER_IP, port))
 
-    packet = Raw(load=request)
+    data = b""
 
-    sock.sendto(bytes(packet), (SERVER_IP, port))
+    while True:
+        response, _ = s.recvfrom(4096)
+        
+        if not response:
+            break
+        
+        print(f"[+] Received chunk: {len(response)} bytes")
+        data += response
 
-    if :
-        response.show()
-
-        request_size = len(bytes(packet[Raw]))
-        response_size = len(bytes(response[Raw])) if response else 0
+    if data:
+        request_size = len(request)
+        response_size = len(data)
 
         print(f"Request Size: {request_size}")
         print(f"Response Size: {response_size}")
         print(f"BAF: {response_size / request_size:.2f}")
     else:
         print("No response")
-
 
 if __name__ == "__main__":
     main()
