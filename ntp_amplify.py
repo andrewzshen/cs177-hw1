@@ -15,6 +15,7 @@ def main():
     port = int(sys.argv[1])
 
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(12)
 
     for i in range(50):
         ip = f"1.1.1.{i}"
@@ -27,19 +28,21 @@ def main():
     s.sendto(request, (SERVER_IP, port))
 
     data = b""
-
-    while True:
-        response, _ = s.recvfrom(4096)
-        
-        if not response:
-            break
-        
-        print(f"[+] Received chunk: {len(response)} bytes")
-        data += response
+    
+    try:        
+        while True:
+            response, _ = s.recvfrom(4096)
+            print(f"[+] Received chunk: {len(response)} bytes")
+            data += response
+    except socket.timeout:
+        print("[*] Done receiving (timeout)")
 
     if data:
         request_size = len(request)
         response_size = len(data)
+
+        print("Response:")
+        print(data.decode())
 
         print(f"Request Size: {request_size}")
         print(f"Response Size: {response_size}")
